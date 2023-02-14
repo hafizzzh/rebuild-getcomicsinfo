@@ -24,9 +24,10 @@ headers = {
 req = requests.get(url, headers=headers)
 soup = BeautifulSoup(req.text, 'html.parser')
 comic = soup.find_all('div', 'post-info')
-for c in comic:
-    title = c.find('a', attrs={"class": None}).text
-    print(title)
+
+def url_maker():
+    url = 'https://getcomics.info/page/{}/?s={}'.format(page_number, search_item)
+    return url
 
 def check_pagination():
     page = soup.find('ul', 'page-numbers')
@@ -35,8 +36,31 @@ def check_pagination():
         for li in page.find_all("li"):
             pages.append(li.text)
         return pages.pop()
+    else:
+        return 0
 
-total_page = check_pagination()
-print(total_page)
+total_page = int(check_pagination())
+f = 0
+if total_page == 0:
+    for c in comic:
+        title = c.find('a', attrs={"class": None}).text
+        print(title)
+else:
+    for c in comic:
+        title = c.find('a', attrs={"class": None}).text
+        f += 1
+        print(f, ' ', title)
+    page_number = 2
+    while page_number <= total_page:
+        url = url_maker()
+        print(url)
+        req = requests.get(url, headers=headers)
+        soup = BeautifulSoup(req.text, 'html.parser')
+        comic = soup.find_all('div', 'post-info')
+        for c in comic:
+            title = c.find('a', attrs={"class": None}).text
+            f += 1
+            print(f, ' ', title)
+        page_number += 1
+
 print(req)
-print(convert_keyword(url))
