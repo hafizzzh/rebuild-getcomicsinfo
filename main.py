@@ -44,23 +44,26 @@ f = 0
 if total_page == 0:
     for c in comic:
         title = c.find('a', attrs={"class": None}).text
-        print(title)
+        link_comic = c.find('a', attrs={"class": None}).get('href')
+        f += 1
+        print(f, ' ', title, ' ', link_comic)
 else:
     for c in comic:
         title = c.find('a', attrs={"class": None}).text
+        link_comic = c.find('a', attrs={"class": None}).get('href')
         f += 1
-        print(f, ' ', title)
+        print(f, ' ', title, ' ', link_comic)
     page_number = 2
     while page_number <= total_page:
         url = url_maker()
-        print(url)
         req = requests.get(url, headers=headers)
         soup = BeautifulSoup(req.text, 'html.parser')
         comic = soup.find_all('div', 'post-info')
         for c in comic:
             title = c.find('a', attrs={"class": None}).text
+            link_comic = c.find('a', attrs={"class": None}).get('href')
             f += 1
-            print(f, ' ', title)
+            print(f, ' ', title, ' ', link_comic)
         page_number += 1
 
 print(req)
