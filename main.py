@@ -25,7 +25,7 @@ req = requests.get(url, headers=headers)
 soup = BeautifulSoup(req.text, 'html.parser')
 comic = soup.find_all('div', 'post-info')
 
-def url_maker():
+def url_maker(page_number):
     url = 'https://getcomics.info/page/{}/?s={}'.format(page_number, search_item)
     return url
 
@@ -39,31 +39,48 @@ def check_pagination():
     else:
         return 0
 
-total_page = int(check_pagination())
-f = 0
-if total_page == 0:
+def get_comic_info(comic):
+    comics = []
     for c in comic:
         title = c.find('a', attrs={"class": None}).text
         link_comic = c.find('a', attrs={"class": None}).get('href')
-        f += 1
-        print(f, ' ', title, ' ', link_comic)
-else:
-    for c in comic:
-        title = c.find('a', attrs={"class": None}).text
-        link_comic = c.find('a', attrs={"class": None}).get('href')
-        f += 1
-        print(f, ' ', title, ' ', link_comic)
-    page_number = 2
-    while page_number <= total_page:
-        url = url_maker()
-        req = requests.get(url, headers=headers)
-        soup = BeautifulSoup(req.text, 'html.parser')
-        comic = soup.find_all('div', 'post-info')
-        for c in comic:
-            title = c.find('a', attrs={"class": None}).text
-            link_comic = c.find('a', attrs={"class": None}).get('href')
-            f += 1
-            print(f, ' ', title, ' ', link_comic)
-        page_number += 1
+        comics.append((title, link_comic))
+    return comics
 
-print(req)
+def print_comics(comics):
+    comics.sort(key=lambda x: x[0])  # Sort comics by title
+    for index, (title, link_comic) in enumerate(comics, start=1):
+        print(index, ' ', title, ' ', link_comic)
+
+def fetch_comics_from_page(url):
+    req = requests.get(url, headers=headers)
+    soup = BeautifulSoup(req.text, 'html.parser')
+    return soup.find_all('div', 'post-info')
+
+def main():
+    total_page = int(check_pagination())
+    all_comics = []
+    
+    # Print total_page info
+    print('Total pages: ', total_page)
+    
+    # Fetch comics from the first page
+    comics = get_comic_info(comic)
+    all_comics.extend(comics)
+    
+
+    # Fetch comics from the remaining pages
+    if total_page > 1:
+        for page_number in range(2, total_page + 1):
+            url = url_maker(page_number)
+            comics = get_comic_info(fetch_comics_from_page(url))
+            all_comics.extend(comics)
+    
+    # Print total comics info
+    print('Total comics: ', len(all_comics))
+
+    # Print all comics sorted globally
+    print_comics(all_comics)
+
+if __name__ == "__main__":
+    main()
