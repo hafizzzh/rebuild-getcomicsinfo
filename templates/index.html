@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Comics Search</title>
+</head>
+<body>
+    <h1>Search for Comics</h1>
+    <form method="post">
+        <label for="keyword">Keyword:</label>
+        <input type="text" id="keyword" name="keyword">
+        <input type="submit" value="Search">
+    </form>
+    {% if search_url %}
+        <h2>Search Result:</h2>
+        <p><a href="{{ search_url }}" target="_blank">{{ search_url }}</a></p>
+        {% if results %}
+            <ul>
+                {% for result in results %}
+                    <li><a href="{{ result.link }}" target="_blank">{{ result.title }}</a></li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No results found.</p>
+        {% endif %}
+    {% endif %}
+</body>
+</html>
