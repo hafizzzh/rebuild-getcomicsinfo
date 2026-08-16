@@ -32,12 +32,10 @@ def url_maker(page_number):
 def check_pagination():
     page = soup.find('ul', 'page-numbers')
     if page is not None:
-        pages = []
-        for li in page.find_all("li"):
-            pages.append(li.text)
-        return pages.pop()
+        numbers = [int(li.text) for li in page.find_all("li") if li.text.strip().isdigit()]
+        return max(numbers) if numbers else 1
     else:
-        return 0
+        return 1
 
 def get_comic_info(comic):
     comics = []
