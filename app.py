@@ -20,10 +20,8 @@ def url_maker(page_number, search_item):
 def check_pagination(soup):
     page = soup.find('ul', 'page-numbers')
     if page is not None:
-        pages = []
-        for li in page.find_all("li"):
-            pages.append(li.text)
-        return int(pages[-2])  # Get the second last item which is the last page number
+        numbers = [int(li.text) for li in page.find_all("li") if li.text.strip().isdigit()]
+        return max(numbers) if numbers else 1
     else:
         return 1
 
